@@ -107,7 +107,8 @@ int main(int argc, char* argv[]) {
 	outFile = fopen(outFileName.c_str(), "w");	
 
 	float t = log2(numReads);		
-	numSeeds = (int) (t*t);
+	numSeeds = (int) (t*t);	
+	numSeeds = min(numSeeds, numReads);		
 	
 	interval = numReads/numSeeds;
 	counter = 0;
