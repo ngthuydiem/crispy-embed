@@ -1,46 +1,19 @@
 #!/bin/zsh
 
-#INPUT="data/V2Mice_sample30000"
-#UNIQUE_INPUT=$INPUT"_Clean"
+#input: $INPUT, $K_CUTOFF, $CUTOFF, $B
+INPUT=$1
+K=$2
+CUTOFF=$3
 
-STEP_SIZE=10
-THRESHOLD=1.0
-K=2
+UNIQUE_INPUT=$INPUT"_Clean"
 
-START=1
-END=1
-
-for (( i=$START; i<=$END; i++ )) 
-do
-(( NUM_READS = $i * $STEP_SIZE ))
-NAME="microbial_"$NUM_READS
-
-INPUT="/DATA/grinder_data"/$NAME"-reads.fa"
-OUTPUT="/DATA/grinder_mat"/$NAME
-UNIQUE_INPUT=$INPUT
-
-echo "#########################  CRISPY-EMBED (GPU) #########################"
-
-START_TIME=$(date +%s.%N)
-#./bin/preprocess -i $INPUT 
-./bin/findSeeds -i $UNIQUE_INPUT -o $UNIQUE_INPUT".pair" -k $K -s 2 -t 0.03
-./bin/kmerDist -i $UNIQUE_INPUT -k $K -c
+./crispy-embed/bin/preprocess -i $INPUT
+./crispy-embed/bin/findSeeds -i $UNIQUE_INPUT -k $K -s 1
+./crispy-embed/bin/kmerDist -i $UNIQUE_INPUT -k $K -c
 
 NUM_READS=`grep '>' $UNIQUE_INPUT | wc -l`
-NUM_ENTRIES=`./bin/euclidDist -i $UNIQUE_INPUT -r $NUM_READS -t $THRESHOLD`
+./crispy-embed/bin/euclidDist -i $UNIQUE_INPUT -n $NUM_READS -t $CUTOFF
 NUM_FILES=`ls $UNIQUE_INPUT".edist"* | wc -l`	
-
-./bin/aveclust -i $UNIQUE_INPUT -m $NUM_ENTRIES -n $NUM_READS -f $NUM_FILES -o $OUTPUT -s 0.1 -e $THRESHOLD
-
-END_TIME=$(date +%s.%N)
-DIFF=$(echo " $END_TIME - $START_TIME " | bc)
-
-(( SPARSITY = $NUM_ENTRIES * 1.0 / ($NUM_READS * ($NUM_READS - 1) / 2) ))
-echo "Sparse matrix contains "$NUM_ENTRIES" entries in "$NUM_FILES" files with sparsity "$SPARSITY
-echo "It took $DIFF seconds"
-
-#rm -f $INPUT"."*
-
-done
-
+./crispy-embed/bin/aveclust -i $UNIQUE_INPUT -n $NUM_READS -f $NUM_FILES -e $CUTOFF 
+echo $NUM_READS $NUM_FILES
 

@@ -62,9 +62,9 @@ int main(int argc, char* argv[]) {
 		arrayDim = 1536;
 		
 	
-	fprintf(stderr, "\n----------------------------------------------------------------------\n");
-	fprintf(stderr, "                 COMPUTE EUCLID DISTANCES                           \n");
-	fprintf(stderr, "File name: %s. numReads: %d. numSeeds: %d. threshold: %.2f\n\n", inFileName.c_str(), numReads, numSeeds, threshold);	
+	printf("\n----------------------------------------------------------------------\n");
+	printf("                 COMPUTE EUCLID DISTANCES                           \n");
+	printf("File name: %s. numReads: %d. numSeeds: %d. threshold: %.2f\n\n", inFileName.c_str(), numReads, numSeeds, threshold);	
 	
 	if (useGPU) {
 		//printf("USE GPU. numStreams: %d\n", NUM_STREAMS);
@@ -82,8 +82,8 @@ int main(int argc, char* argv[]) {
 	gettimeofday(&endTime, NULL);	
 	long elapsedTime = (endTime.tv_sec - startTime.tv_sec) * 1000u + (endTime.tv_usec - startTime.tv_usec) / 1.e3 + 0.5;
 	
-	fprintf(stderr, "Time taken: %.3f s\n", elapsedTime/1.e3);
-	fprintf(stderr, "\n----------------------------------------------------------------------\n");
+	printf("Time taken: %.3f s\n", elapsedTime/1.e3);
+	printf("\n----------------------------------------------------------------------\n");
 	
 	return 0;
 }
@@ -116,9 +116,9 @@ void Trag_reverse_eq(int index, int N, int& row, int& col)
 void help()
 {
 	cout << "<-i inFileName>: FASTA file " << endl;	
-	cout << "[-r numReads]: number of reads" << endl;
+	cout << "[-n numReads]: number of reads" << endl;
 	cout << "[-t threshold] : value range: 0.0 to 1.0, default: 0.5" << endl;
-	cout << "[-n numThreads]: value range: 1 to maxNumProcs, default: 1" << endl;	
+	cout << "[-p numThreads]: value range: 1 to maxNumProcs, default: 1" << endl;	
 	cout << "[-d]		    : output euclid distances " << endl;
 	cout << "[-c]           : use CPU instead of GPU" << endl;
 	cout << "[-m]           : use MPI version for GPU cluster" << endl;
@@ -143,7 +143,7 @@ void getCommandOptions(int argc, char* argv[], string &inFileName, float &thresh
 				exit(-1);				
 			}		
 		}		
-		if (strcmp("-r", argv[i]) == 0) {
+		if (strcmp("-n", argv[i]) == 0) {
 			numReads = atoi(argv[i + 1]);				
 			if (numReads < 1)
 			{
@@ -151,7 +151,7 @@ void getCommandOptions(int argc, char* argv[], string &inFileName, float &thresh
 				exit(-1);
 			}
 		}
-		if (strcmp("-n", argv[i]) == 0) {
+		if (strcmp("-p", argv[i]) == 0) {
 			numThreads = atoi(argv[i + 1]);				
 			if (numThreads < 1 || numThreads > omp_get_num_procs())
 			{

@@ -326,11 +326,16 @@ void getCommandOptions(int argc, char* argv[], string &inFileName, string &outFi
 		}
 	}
 	// process input and output files
-	if (inFileName.length() < 2 || outFileName.length() < 2)
+	if (inFileName.length() < 2)
 	{
 		usage();
 		exit(0);
 	}	
+	
+ 	if (outFileName.length() < 2) {
+ 		outFileName = inFileName;
+ 		outFileName.append(".pair");
+ 	} 		
 }
 
 int compareTwoTuples(const void* t1, const void* t2) {
