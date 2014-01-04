@@ -78,8 +78,11 @@ void computeEuclidDist_CPU(float ** eReads, string pairFileName, string distFile
 	unsigned long long totalNumPairs = 0, count = 0;
 	int fileId = 0;
 	
-	thrust::host_vector< float > h_distVector (MAX_NUM_PAIRS_CPU * 2);	
-	thrust::host_vector< thrust::pair<unsigned int, unsigned int> > h_pairVector (MAX_NUM_PAIRS_CPU * 2);	
+	size_t maxNumPairs = numReads*256;
+	if (maxNumPairs > MAX_NUM_PAIRS)
+		maxNumPairs = MAX_NUM_PAIRS;
+	thrust::host_vector< float > h_distVector (maxNumPairs * 2);	
+	thrust::host_vector< thrust::pair<unsigned int, unsigned int> > h_pairVector (maxNumPairs * 2);	
 
 	for (i = 0; i < numReads; ++i)
 	{
@@ -107,7 +110,7 @@ void computeEuclidDist_CPU(float ** eReads, string pairFileName, string distFile
 		}	
 		}
 		
-		if (count >= MAX_NUM_PAIRS_CPU)
+		if (count >= maxNumPairs)
 		{		
 			h_pairVector.resize(count);
 			h_distVector.resize(count);			
@@ -118,8 +121,8 @@ void computeEuclidDist_CPU(float ** eReads, string pairFileName, string distFile
 			totalNumPairs += count;
 			count = 0;										
 			
-			h_pairVector.resize(MAX_NUM_PAIRS_CPU * 2);
-			h_distVector.resize(MAX_NUM_PAIRS_CPU * 2);	
+			h_pairVector.resize(maxNumPairs * 2);
+			h_distVector.resize(maxNumPairs * 2);	
 		}		
 	}
 	if (count > 0)

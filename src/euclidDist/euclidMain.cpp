@@ -17,12 +17,14 @@ int main(int argc, char* argv[]) {
 	
 	string inFileName, inDistName, pairFileName, distFileName;
 	bool useGPU = true;
-	float threshold = THRESHOLD;	
+	float threshold = -1;	
 
 	unsigned long long totalNumPairs = 0;
 	int i, numReads, numSeeds, arrayDim, readSize, numThreads=1;
 	// open the output file
 	getCommandOptions(argc, argv, inFileName, threshold, useGPU, numThreads, numReads);
+	if (threshold < 0)
+		threshold = 1/log2((double)numReads);
 	
 	inDistName = inFileName;
 	pairFileName = inFileName;
@@ -160,13 +162,7 @@ void getCommandOptions(int argc, char* argv[], string &inFileName, float &thresh
 			}
 		}
 		if (strcmp("-t", argv[i]) == 0) {
-			threshold = (float)atof(argv[i + 1]);			
-			// check distance threshold 
-			if (threshold < 0.0f || threshold > 1.0f)
-			{
-				cout << "Warning: invalid distance threshold (-t option). Set to " << THRESHOLD << "."<< endl;
-				threshold = THRESHOLD;
-			}
+			threshold = (float)atof(argv[i + 1]);						
 		}
 		if (strcmp("-c", argv[i]) == 0)
 			useGPU = false;

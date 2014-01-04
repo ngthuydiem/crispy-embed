@@ -27,8 +27,7 @@ using namespace std;
 #define THRESHOLD 				0.1
 #define EPSILON 				0.00001
 #define BUF_SIZE				4096
-#define MAX_NUM_PAIRS_GPU 		1024*1024*32
-#define MAX_NUM_PAIRS_CPU 		1024*1024*32
+#define MAX_NUM_PAIRS 			1024*1024*32
 
 void removeNewLine(string &line);
 

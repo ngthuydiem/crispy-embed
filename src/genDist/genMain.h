@@ -20,8 +20,7 @@
 using namespace std;
 
 #define BUF_SIZE 		4096
-#define MAX_NUM_PAIRS_GPU 		1024*1024*32
-#define MAX_NUM_PAIRS_CPU 		1024*1024*32
+#define MAX_NUM_PAIRS 		1024*1024*32
 
 #define BLOCK_SIZE		576
 #define GRID_SIZE		256

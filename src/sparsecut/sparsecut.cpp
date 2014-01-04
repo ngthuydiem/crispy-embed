@@ -309,8 +309,8 @@ int printClusters(NodeSet roots, IDList orphanNodes,
 			tempList.clear();
 		}
 
-		fprintf(clusterListFile," %.3f ", distLevel);
-		fprintf(clusterFile," %.3f ", distLevel);
+		fprintf(clusterListFile," %.6f ", distLevel);
+		fprintf(clusterFile," %.6f ", distLevel);
 		
 		// write the nodeList to file
 		tempList.clear();
@@ -366,7 +366,7 @@ int printClusters(NodeSet roots, IDList orphanNodes,
 		numOTUs += orphanNodes.size();
 		fprintf(clusterFile,"|\n");
 		fprintf(clusterListFile, "\n");		
-		printf("Dist: %.3f. numOTUs: %u. numSingletons: %lu\n", distLevel, numOTUs, orphanNodes.size());
+		printf("Dist: %.6f. numOTUs: %u. numSingletons: %lu\n", distLevel, numOTUs, orphanNodes.size());
 	}
 	
 	printf("\n");
