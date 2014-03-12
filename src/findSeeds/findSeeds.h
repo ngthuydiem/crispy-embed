@@ -24,7 +24,7 @@ typedef struct read {
 	int length;
 	char* sequence;
 	int numTuples;
-	unsigned short* tuples;
+	unsigned int* tuples;
 
 	void initialize(int readId, const char* seq, int K);
 	void finalize();

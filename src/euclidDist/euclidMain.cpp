@@ -24,7 +24,9 @@ int main(int argc, char* argv[]) {
 	// open the output file
 	getCommandOptions(argc, argv, inFileName, threshold, useGPU, numThreads, numReads);
 	if (threshold < 0)
-		threshold = 1/log2((double)numReads);
+		threshold = 1/(2*log((double)numReads));
+	if (threshold < 0 || threshold > 1)
+		threshold = 0.1;
 	
 	inDistName = inFileName;
 	pairFileName = inFileName;
@@ -58,25 +60,24 @@ int main(int argc, char* argv[]) {
 	for (i = 0; i < numReads; ++i) 
 		fread(eReads[i], sizeof(float), numSeeds, inDistFile);
 		
-	arrayDim = (int)(16 * pow(8.0, floor(log10((double)numReads))-1));	 
+	arrayDim = (int)4*(pow(8.0, floor(log10((double)numReads))-1));	 
 
 	if (arrayDim > 1536)
 		arrayDim = 1536;
-		
-	
+			
 	printf("\n----------------------------------------------------------------------\n");
 	printf("                 COMPUTE EUCLID DISTANCES                           \n");
 	printf("File name: %s. numReads: %d. numSeeds: %d. threshold: %.2f\n\n", inFileName.c_str(), numReads, numSeeds, threshold);	
 	
 	if (useGPU) {
-		//printf("USE GPU. numStreams: %d\n", NUM_STREAMS);
+		printf("USE GPU. numStreams: %d\n", NUM_STREAMS);
 		computeEuclidDist_CUDA(eReads, pairFileName, distFileName, numReads, numSeeds, threshold, arrayDim);					
 	}
 	else {	
-		//printf("USE CPU. numThreads: %d\n", numThreads);
+		printf("USE CPU. numThreads: %d\n", numThreads);
 		
 		omp_set_num_threads(numThreads);
-		computeEuclidDist_CPU(eReads, pairFileName, distFileName, numReads, numSeeds, threshold);
+		computeEuclidDist_CPU(eReads, pairFileName, distFileName, numReads, numSeeds, threshold, arrayDim);
 	}
 
 	fclose(inDistFile);			

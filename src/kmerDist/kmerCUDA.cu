@@ -21,16 +21,16 @@ void computeKmerDist_CUDA(READ* &readArray, FILE* pairFile, FILE* distFile, int 
 	
 	if (maxNumTuples%16 != 0)
 			maxNumTuples += 16 - (maxNumTuples%16);	
-	printf("maxNumTuples: %d\n", maxNumTuples);
+	printf("array size: %.3f KB\n", (float)(maxNumTuples * numReads * sizeof(uint))/1024);
 			
 	// determine gridSize and blockSize
 	size_t threadsPerBlock(BLOCK_SIZE);
 	size_t blocksPerGrid(GRID_SIZE);
 		
 	// declare host variables
-	ushort *tupleSet;	
+	uint *tupleSet;	
 	// allocate host memory
-	tupleSet = (ushort *) malloc(numReads * maxNumTuples * sizeof(ushort));
+	tupleSet = (uint *) malloc(numReads * maxNumTuples * sizeof(uint));
 	
 	for (i = 0; i < numReads; ++i)
 	{
@@ -65,7 +65,7 @@ void computeKmerDist_CUDA(READ* &readArray, FILE* pairFile, FILE* distFile, int 
 		checkCudaErrors( cudaStreamCreate(&stream[i]) );
 
 	// use cudaArray to store tupleArraySet
-	cudaChannelFormatDesc channelDesc=cudaCreateChannelDesc<ushort>();
+	cudaChannelFormatDesc channelDesc=cudaCreateChannelDesc<uint>();
 	cudaArray *cuArray;
 	size_t width, height;
 	width = maxNumTuples*64;
@@ -73,7 +73,7 @@ void computeKmerDist_CUDA(READ* &readArray, FILE* pairFile, FILE* distFile, int 
 	if ( (numReads&63) != 0) 
 	 	++height;
 	checkCudaErrors( cudaMallocArray(&cuArray, &channelDesc, width, height) );
-	checkCudaErrors( cudaMemcpyToArray(cuArray, 0, 0, tupleSet, maxNumTuples * numReads * sizeof(ushort), cudaMemcpyHostToDevice) );
+	checkCudaErrors( cudaMemcpyToArray(cuArray, 0, 0, tupleSet, maxNumTuples * numReads * sizeof(uint), cudaMemcpyHostToDevice) );
 	checkCudaErrors( cudaBindTextureToArray(getTexRef(), cuArray, channelDesc) );
 	free(tupleSet);
 	

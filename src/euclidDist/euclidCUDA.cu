@@ -98,10 +98,9 @@ void writeToVector(thrust::host_vector< thrust::pair<unsigned int, unsigned int>
 		{
 			h_pairVector[count] = thrust::make_pair(row, col);
 			h_distVector[count] = dist;
-
 			++count;
 		}							
-	}									
+	}		
 }
 
 void computeEuclidDist_CUDA(float ** eReads, string pairFileName, string distFileName, int numReads, int numSeeds, float threshold, int arrayDim) {
@@ -114,6 +113,11 @@ void computeEuclidDist_CUDA(float ** eReads, string pairFileName, string distFil
 	int arraySize = size * NUM_STREAMS;
 	int gridSize = (arrayDim + BLOCK_DIM - 1)/BLOCK_DIM;	
 	int stageDim =  (numReads + arrayDim - 1)/arrayDim;
+
+	size_t maxNumPairs = arraySize;	
+	cout << "arrayDim: " << arrayDim << endl;
+	cout << "maxNumPairs: " << maxNumPairs << endl;	
+	cout << "arraySize: " << arraySize << endl;
 	
 	// determine GRID_DIM and blockSize
 	dim3 threadsPerBlock(BLOCK_DIM, BLOCK_DIM);	
@@ -128,6 +132,8 @@ void computeEuclidDist_CUDA(float ** eReads, string pairFileName, string distFil
 	float *d_in;
 	checkCudaErrors( cudaMalloc((void**)&d_in, numReads * numSeeds * sizeof(float)) );	
 	checkCudaErrors( cudaMallocHost((void**)&h_in, numReads * numSeeds * sizeof(float)) );
+	
+	printf("h_in size: %.2f MB\n", (double)numReads * numSeeds * sizeof(float)/(1024*1024));
 	
 	for (i = 0; i < numReads; ++i)
 	{
@@ -180,22 +186,18 @@ void computeEuclidDist_CUDA(float ** eReads, string pairFileName, string distFil
 
 	checkCudaErrors( cudaMalloc((void**)&d_out, arraySize * sizeof(float)) );	
 	checkCudaErrors( cudaMallocHost((void**)&h_out, arraySize * sizeof(float)) );
-				
+
+	printf("h_out size: %.2f MB\n", (double)arraySize*sizeof(float)/(1024*1024));
 	cudaStream_t streams[NUM_STREAMS];
 
 	for (i = 0; i < NUM_STREAMS; ++i) 
 		checkCudaErrors( cudaStreamCreate(&streams[i]) );			
 
-	size_t maxNumPairs = numReads*512;
-	if (maxNumPairs > MAX_NUM_PAIRS)
-		maxNumPairs = MAX_NUM_PAIRS;
-		
 	thrust::host_vector< float > h_distVector (maxNumPairs * 2);	
 	thrust::host_vector< thrust::pair<unsigned int, unsigned int> > h_pairVector (maxNumPairs * 2);
 
 	int stageSize = stageDim * (stageDim + 1) / 2;												
-	
-	
+		
 	for (j = 0; j < stageSize; j += NUM_STREAMS)
 	{		
 
@@ -204,44 +206,41 @@ void computeEuclidDist_CUDA(float ** eReads, string pairFileName, string distFil
 			stageId = i + j;
 			
 			if (stageId < stageSize) {
-				Trag_reverse_eq(stageId, stageDim, stageX, stageY);													
+				Trag_reverse_eq(stageId, stageDim, stageX, stageY);
 						        								
 				//launchEuclidKernel(streams[i], blocksPerGrid, threadsPerBlock, d_in, d_out+offset, numReads, numSeeds, stageX, stageY, arrayDim, d_var);	
 				launchEuclidKernel(streams[i], blocksPerGrid, threadsPerBlock, d_in, d_out+offset, numReads, numSeeds, stageX, stageY, arrayDim);	
 				
 				checkCudaErrors( cudaMemcpyAsync(h_out+offset, d_out+offset, size * sizeof(float), cudaMemcpyDeviceToHost, streams[i]) );							
-				 		
 			}
 		}		
 
-		cudaDeviceSynchronize();
+		cudaDeviceSynchronize();		
 		
 		for (i = 0; i < NUM_STREAMS; ++i) {								
 			offset = i * size;		
 			stageId = i + j;				
 
-			if (stageId < stageSize) {							
-							
+			if (stageId < stageSize) {														
 				Trag_reverse_eq(stageId, stageDim, stageX, stageY);		
-				
 				writeToVector(h_pairVector, h_distVector, h_out+offset, stageX, stageY, arrayDim, threshold, count);
-																											
 			}
 		}				
-		
+				
 		if (count >= maxNumPairs)
-		{			
+		{	
 			h_pairVector.resize(count);
 			h_distVector.resize(count);	
 	
 			writeVectorToFile_GPU(h_pairVector, h_distVector, pairFileName, distFileName, count, fileId);	
+						
+			++ fileId;
+			totalNumPairs += count;
+			count = 0;										
 			
 			h_pairVector.resize(maxNumPairs * 2);
 			h_distVector.resize(maxNumPairs * 2);	
 
-			++ fileId;
-			totalNumPairs += count;
-			count = 0;										
 		}				
 	}	
 	

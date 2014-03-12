@@ -9,18 +9,18 @@
 // Note: don't use_fast_math option
 #include "kmerKernel.h"
 
-texture<ushort, 2, cudaReadModeElementType> texRef;
+texture<uint, 2, cudaReadModeElementType> texRef;
 
-texture<ushort, 2, cudaReadModeElementType> &getTexRef(void)
+texture<uint, 2, cudaReadModeElementType> &getTexRef(void)
 {
         return texRef;
 }
 
 __global__ void kmerKernel(int * pairArray, float *distArray, int maxNumTuples, int numPairs) 
 {
-	ushort matches = 0;
-	ushort x, y, k, l;
-	ushort tuple1Length, tuple2Length;
+	uint matches = 0;
+	uint x, y, k, l;
+	uint tuple1Length, tuple2Length;
 	int row, col;
 
 	int pairIndex = blockIdx.x * blockDim.x + threadIdx.x;
@@ -37,9 +37,9 @@ __global__ void kmerKernel(int * pairArray, float *distArray, int maxNumTuples, 
 			x = tex2D(texRef, maxNumTuples * (row & 63) + k, row/64);
 			y = tex2D(texRef, maxNumTuples * (col & 63) + l, col/64);
 
-			matches = matches + (ushort)(x==y);
-			k = k + (ushort)(x<=y);
-			l = l + (ushort)(x>=y);	
+			matches = matches + (uint)(x==y);
+			k = k + (uint)(x<=y);
+			l = l + (uint)(x>=y);	
 		}
 		distArray[pairIndex] = 1.0f - (float) matches / min(tuple1Length, tuple2Length);		
 	}

@@ -14,7 +14,7 @@ void computeKmerDist_CPU(READ* &readArray, FILE* pairFile, FILE* distFile, int n
 	int numPairs, pairIndex, EOFTag;
 	float dist;
 	long totalNumPairs = 0;
-	unsigned short x, y, length1, length2, matches;
+	unsigned int x, y, length1, length2, matches;
 
 	int *pairArray;
 	pairArray = (int*) malloc(NUM_PAIRS * 2 * sizeof(int));
@@ -41,9 +41,9 @@ void computeKmerDist_CPU(READ* &readArray, FILE* pairFile, FILE* distFile, int n
 				x = readArray[i].tuples[k];
 				y = readArray[j].tuples[l];
 
-				matches = matches + (unsigned short)(x==y);
-				k = k + (unsigned short)(x<=y);
-				l = l + (unsigned short)(x>=y);	
+				matches = matches + (unsigned int)(x==y);
+				k = k + (unsigned int)(x<=y);
+				l = l + (unsigned int)(x>=y);	
 			}
 
 			dist = 1.0f - (float) matches / min(length1,length2);

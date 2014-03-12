@@ -36,7 +36,7 @@ inline void __getLastCudaError( const char *errorMessage, const char *file, cons
     }
 }
 
-texture<ushort, 2, cudaReadModeElementType> &getTexRef(void);
+texture<uint, 2, cudaReadModeElementType> &getTexRef(void);
 
 void launchKmerKernel(cudaStream_t stream, dim3 blocksPerGrid, dim3 threadsPerBlock, int *d_pairArray, float* d_distArray, int maxNumTuples, int numPairs);
 

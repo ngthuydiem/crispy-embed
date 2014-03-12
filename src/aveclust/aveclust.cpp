@@ -270,7 +270,7 @@ int printClusters(NodeSet roots, IDList orphanNodes,
 	printf("\n");
 
 	// for each distance level
-	float stepSize = endLevel/5;
+	float stepSize = endLevel/10;
 	for(float distLevel=stepSize; distLevel<endLevel || fabs(distLevel-endLevel) < EPSILON; distLevel+=stepSize)
 	{   
 		numOTUs = 0;
@@ -355,13 +355,13 @@ int printClusters(NodeSet roots, IDList orphanNodes,
 
 		if (orphanNodes.size() > 0)
 		{
-			printf("Singletons: ");
+			//printf("Singletons: ");
 			for (it = orphanNodes.begin(); it != orphanNodes.end(); ++it) {
 				printf("|%u",(*it));
 				fprintf(clusterFile,"|%u",(*it));
 				fprintf(clusterListFile, "1 ");
 			}
-			printf("\n");
+			//printf("\n");
 		}
 		numOTUs += orphanNodes.size();
 		fprintf(clusterFile,"|\n");
@@ -672,7 +672,7 @@ int main(int argc, char* argv[])
 	struct rlimit r;
 	getrlimit(RLIMIT_NOFILE, &r);
 	cout << "current rlimit: " << r.rlim_cur << endl;
-	r.rlim_cur = 2048;
+	r.rlim_cur = 1024 * 16;
 	setrlimit(RLIMIT_NOFILE, &r);
 	cout << "change rlimit to: " << r.rlim_cur << endl;
 	
@@ -698,7 +698,9 @@ int main(int argc, char* argv[])
 
 	getOptions(argc, argv, inFileName, numFiles, endLevel, numReads, outFileName);
 	if (endLevel < 0)
-		endLevel = 1/log2((double)numReads);
+		endLevel = 1/(2*log((double)numReads));
+	if (endLevel < 0 || endLevel > 1)
+		endLevel = 0.1;
 	getDistNameList(inFileName, pairNameVector, distNameVector, numFiles);
 	
 	FILE * outFile = NULL;
@@ -724,7 +726,7 @@ int main(int argc, char* argv[])
 	string mergeFileName;
 
 	mergeFileName=inFileName;
-	mergeFileName.append("_Merge");
+	mergeFileName.append("_Embed_Merge");
 	mergeFile = fopen(mergeFileName.c_str(), "w");		
 
 	if(pairNameVector.size()==0)

@@ -22,14 +22,14 @@ using namespace std;
 
 #define BUF_SIZE		4096
 #define BLOCK_SIZE		128
-#define GRID_SIZE		BLOCK_SIZE * 64
+#define GRID_SIZE		128
 #define NUM_STREAMS		4
 #define NUM_PAIRS		BLOCK_SIZE * GRID_SIZE * NUM_STREAMS
 
 #define EPSILON 			0.00001
-#define DEFAULT_NUM_READS 	1000000
-#define MAX_READ_LEN		4096
-#define MAX_NUM_READS		2097152
+#define DEFAULT_NUM_READS 	250000
+#define MAX_READ_LEN		1024
+#define MAX_NUM_READS		1024*1024
 
 #define max(a, b) ((a)>(b)?a:b)
 #define min(a, b) ((a)<(b)?a:b)
@@ -41,7 +41,7 @@ typedef struct read {
 	int length;
 	char* sequence;
 	int numTuples;
-	unsigned short* tuples;
+	unsigned int* tuples;
 
 	void initialize(int readId, const char* seq, int K);
 	void finalize();

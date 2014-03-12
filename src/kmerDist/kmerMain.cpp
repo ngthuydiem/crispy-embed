@@ -109,7 +109,7 @@ void READ::formTuples(int K) {
 
 	// calculate the number of tuples for each sequence
 	int symbolIndex, tupleIndex;
-	this->tuples = (unsigned short*) calloc(this->numTuples, sizeof(unsigned short));
+	this->tuples = (unsigned int*) calloc(this->numTuples, sizeof(unsigned int));
 
 	// for each symbol in the sequence
 	for (symbolIndex = 0, tupleIndex = 0; symbolIndex < this->length; symbolIndex++) {
@@ -117,10 +117,10 @@ void READ::formTuples(int K) {
 			tuples[tupleIndex] = 0;
 		if (symbolIndex >= K) {
 			++tupleIndex;
-			this->tuples[tupleIndex] = (this->tuples[tupleIndex - 1] << (2 * (9
+			this->tuples[tupleIndex] = (this->tuples[tupleIndex - 1] << (2 * (17
 				- K)));
 			this->tuples[tupleIndex] = (this->tuples[tupleIndex] >> (2
-				* (8 - K)));
+				* (16 - K)));
 		} else {
 			this->tuples[tupleIndex] = (this->tuples[tupleIndex] << 2);
 		}
@@ -146,7 +146,7 @@ void READ::formTuples(int K) {
 
 void READ::sortTuples() {
 
-	qsort(this->tuples, this->numTuples, sizeof(short int), compareTwoTuples);
+	qsort(this->tuples, this->numTuples, sizeof(unsigned int), compareTwoTuples);
 }
 
 void writeToFile(FILE * distFile, float * h_distArray, int numPairs, long & totalNumPairs)
@@ -212,7 +212,7 @@ void getCommandOptions(int argc, char* argv[], string &inFileName, bool &useGPU,
 
 int compareTwoTuples(const void* t1, const void* t2) {
 
-	return (*(short int*) t1 - *(short int*) t2);
+	return (*(unsigned int*) t1 - *(unsigned int*) t2);
 
 }
 

@@ -2,9 +2,9 @@
 
 float computeKDist(READ *readArray, int kValue, int id1, int id2) {
 
-	unsigned short x, y, length1, length2, matches;
+	unsigned int x, y, length1, length2, matches;
 	float dist;
-	int k,l;
+	unsigned int k,l;
 	
 	matches = 0;
 	length1 = readArray[id1].length - kValue + 1;
@@ -15,9 +15,9 @@ float computeKDist(READ *readArray, int kValue, int id1, int id2) {
 		x = readArray[id1].tuples[k];
 		y = readArray[id2].tuples[l];
 
-		matches = matches + (unsigned short)(x==y);
-		k = k + (unsigned short)(x<=y);
-		l = l + (unsigned short)(x>=y);	
+		matches = matches + (unsigned int)(x==y);
+		k = k + (unsigned int)(x<=y);
+		l = l + (unsigned int)(x>=y);	
 	}
 
 	dist = 1.0f - (float) matches / ( (length1 < length2) ? length1 : length2 );	
@@ -27,11 +27,11 @@ float computeKDist(READ *readArray, int kValue, int id1, int id2) {
 float computeTotalKDist(READ *readArray, int kValue, unordered_set<int> idSet, int id2) {
 
 	float totalDist, dist;
-	unsigned short x, y, length1, length2, matches;
-	int i, k,l, id1;
+	unsigned int x, y, length1, length2, matches;
+	unsigned int i, k, l, id1;
 		
 	unordered_set<int>::iterator it;
-	int count = 0;
+	unsigned int count = 0;
 	
 	int *id_array;
 	id_array = (int*) calloc(idSet.size(),sizeof(int));
@@ -55,9 +55,9 @@ float computeTotalKDist(READ *readArray, int kValue, unordered_set<int> idSet, i
 			x = readArray[id1].tuples[k];
 			y = readArray[id2].tuples[l];
 
-			matches = matches + (unsigned short)(x==y);
-			k = k + (unsigned short)(x<=y);
-			l = l + (unsigned short)(x>=y);	
+			matches = matches + (unsigned int)(x==y);
+			k = k + (unsigned int)(x<=y);
+			l = l + (unsigned int)(x>=y);	
 		}
 
 		dist = 1.0f - (float) matches / ( (length1 < length2) ? length1 : length2 );	
@@ -244,16 +244,16 @@ void READ::formTuples(int kValue) {
 
 	// calculate the number of tuples for each sequence
 	int symbolIndex, tupleIndex;
-	this->tuples = (unsigned short*) calloc(this->numTuples, sizeof(unsigned short));
+	this->tuples = (unsigned int*) calloc(this->numTuples, sizeof(unsigned int));
 	for (symbolIndex = 0, tupleIndex = 0; symbolIndex < this->length; symbolIndex++) {
 		if (symbolIndex == 0)
 			tuples[tupleIndex] = 0;
 		if (symbolIndex >= kValue) {
 			++tupleIndex;
-			this->tuples[tupleIndex] = (this->tuples[tupleIndex - 1] << (2 * (9
+			this->tuples[tupleIndex] = (this->tuples[tupleIndex - 1] << (2 * (17
 				- kValue)));
 			this->tuples[tupleIndex] = (this->tuples[tupleIndex] >> (2
-				* (8 - kValue)));
+				* (16 - kValue)));
 		} else {
 			this->tuples[tupleIndex] = (this->tuples[tupleIndex] << 2);
 		}
@@ -279,7 +279,7 @@ void READ::formTuples(int kValue) {
 
 void READ::sortTuples() {
 
-	qsort(this->tuples, this->numTuples, sizeof(short int), compareTwoTuples);
+	qsort(this->tuples, this->numTuples, sizeof(unsigned int), compareTwoTuples);
 }
 
 void usage()
@@ -340,7 +340,7 @@ void getCommandOptions(int argc, char* argv[], string &inFileName, string &outFi
 
 int compareTwoTuples(const void* t1, const void* t2) {
 
-	return (*(short int*) t1 - *(short int*) t2);
+	return (*(unsigned int*) t1 - *(unsigned int*) t2);
 
 }
 

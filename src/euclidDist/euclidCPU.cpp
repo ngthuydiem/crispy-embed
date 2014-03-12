@@ -71,16 +71,14 @@ void writeVectorToFile_CPU(thrust::host_vector< thrust::pair<unsigned int, unsig
 	fclose(distFile);
 }
 
-void computeEuclidDist_CPU(float ** eReads, string pairFileName, string distFileName, int numReads, int numSeeds, float threshold)
+void computeEuclidDist_CPU(float ** eReads, string pairFileName, string distFileName, int numReads, int numSeeds, float threshold, int arrayDim)
 {
 	int i, j, k;
 	float diff, dist, sum;
 	unsigned long long totalNumPairs = 0, count = 0;
 	int fileId = 0;
 	
-	size_t maxNumPairs = numReads*256;
-	if (maxNumPairs > MAX_NUM_PAIRS)
-		maxNumPairs = MAX_NUM_PAIRS;
+	size_t maxNumPairs = arrayDim * arrayDim;
 	thrust::host_vector< float > h_distVector (maxNumPairs * 2);	
 	thrust::host_vector< thrust::pair<unsigned int, unsigned int> > h_pairVector (maxNumPairs * 2);	
 

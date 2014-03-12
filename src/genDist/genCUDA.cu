@@ -115,7 +115,7 @@ void computeGenDist_CUDA(FILE* inFile, string outFileName, READ* &readArray, int
 	size_t maxNumPairs = numReads*128;
 	if (maxNumPairs > MAX_NUM_PAIRS)
 		maxNumPairs = MAX_NUM_PAIRS;
-	thrust::host_vector< float > h_distVector (maxNumPairs * 2);	
+	thrust::host_vector< float > h_distVector (maxNumPairs);	
 	thrust::host_vector< thrust::pair<unsigned int, unsigned int> > h_pairVector (maxNumPairs * 2);	
 	float dist;
 	// obtain file size:
@@ -184,13 +184,13 @@ void computeGenDist_CUDA(FILE* inFile, string outFileName, READ* &readArray, int
 		
 		if (count >= maxNumPairs)
 		{			
-			h_pairVector.resize(count);
-			h_distVector.resize(count);	
+			//h_pairVector.resize(count);
+			//h_distVector.resize(count);	
 	
 			writeVectorToFile_GPU(h_pairVector, h_distVector, outFileName, count, fileId);	
 			
-			h_pairVector.resize(maxNumPairs * 2);
-			h_distVector.resize(maxNumPairs * 2);	
+			//h_pairVector.resize(maxNumPairs * 2);
+			//h_distVector.resize(maxNumPairs * 2);	
 	
 			++ fileId;
 			totalNumPairs += count;
