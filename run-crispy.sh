@@ -12,7 +12,7 @@ UNIQUE_INPUT=$INPUT"_Clean"
 $PROFILER ./crispy-embed/bin/kmerDist -i $UNIQUE_INPUT -k $K 
 
 NUM_READS=`grep '>' $UNIQUE_INPUT | wc -l`
-$PROFILER ./crispy-embed/bin/euclidDist -i $UNIQUE_INPUT -n $NUM_READS 
+$PROFILER ./crispy-embed/bin/euclidDist -i $UNIQUE_INPUT -n $NUM_READS
 NUM_FILES=`ls $UNIQUE_INPUT".edist"* | wc -l`	
 $PROFILER ./crispy-embed/bin/aveclust -i $UNIQUE_INPUT -n $NUM_READS -f $NUM_FILES 
-
+#$PROFILER ./crispy-embed/bin/aveclust -i $UNIQUE_INPUT -n $NUM_READS -f $NUM_FILES -o $UNIQUE_INPUT"_Embed_Dist"

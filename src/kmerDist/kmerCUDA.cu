@@ -31,6 +31,10 @@ void computeKmerDist_CUDA(READ* &readArray, FILE* pairFile, FILE* distFile, int 
 	uint *tupleSet;	
 	// allocate host memory
 	tupleSet = (uint *) malloc(numReads * maxNumTuples * sizeof(uint));
+	float tupleSetSize = (float) numReads * maxNumTuples * sizeof(uint) / (1024 * 1024);
+	cout << "tupleSetSize: " << tupleSetSize << endl;
+	float pairArraySize = (float) NUM_PAIRS * 2 * sizeof(int) / (1024 * 1024);
+	cout << "pairArraySize: " << pairArraySize << endl;
 	
 	for (i = 0; i < numReads; ++i)
 	{

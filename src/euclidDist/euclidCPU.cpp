@@ -98,8 +98,7 @@ void computeEuclidDist_CPU(float ** eReads, string pairFileName, string distFile
 			dist = sqrt(sum/numSeeds);
 
 			#pragma omp critical			
-			//if (dist < threshold || fabs(dist-threshold) < EPSILON)
-			if (dist < threshold)
+			if (dist < threshold || fabs(dist-threshold) < EPSILON)
 			{
 				h_pairVector[count] = thrust::make_pair(i,j);
 				h_distVector[count] = dist;

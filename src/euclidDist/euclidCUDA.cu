@@ -93,8 +93,8 @@ void writeToVector(thrust::host_vector< thrust::pair<unsigned int, unsigned int>
 		row = rowOffset + (int)i / arrayDim;
 		col = colOffset + (int)i % arrayDim;	
 		dist = h_out[i];	
-		//if (dist < threshold || fabs(dist-threshold) < EPSILON)
-		if (dist < threshold)
+		//cout << row << "\t" << col << "\t" << dist << endl;
+		if (dist < threshold || fabs(dist-threshold) < EPSILON)
 		{
 			h_pairVector[count] = thrust::make_pair(row, col);
 			h_distVector[count] = dist;
@@ -122,11 +122,10 @@ void computeEuclidDist_CUDA(float ** eReads, string pairFileName, string distFil
 	// determine GRID_DIM and blockSize
 	dim3 threadsPerBlock(BLOCK_DIM, BLOCK_DIM);	
 	dim3 blocksPerGrid(gridSize, gridSize);	
-/*		
-	// get number of SMs on this GPU
+
 	printf("size: %dx%d, arraySize: %d, stageDim: %dx%d\n", arrayDim, arrayDim, arraySize, stageDim, stageDim);	
 	printf("blockSize: %dx%d, gridSize: %dx%d\n", BLOCK_DIM, BLOCK_DIM, gridSize, gridSize); 	
-*/
+	
 	// declare host variables
 	float *h_in;
 	float *d_in;
@@ -207,6 +206,7 @@ void computeEuclidDist_CUDA(float ** eReads, string pairFileName, string distFil
 			
 			if (stageId < stageSize) {
 				Trag_reverse_eq(stageId, stageDim, stageX, stageY);
+				//cout << stageId << "\t" << stageX << "\t" << stageY << endl;
 						        								
 				//launchEuclidKernel(streams[i], blocksPerGrid, threadsPerBlock, d_in, d_out+offset, numReads, numSeeds, stageX, stageY, arrayDim, d_var);	
 				launchEuclidKernel(streams[i], blocksPerGrid, threadsPerBlock, d_in, d_out+offset, numReads, numSeeds, stageX, stageY, arrayDim);	
@@ -223,6 +223,7 @@ void computeEuclidDist_CUDA(float ** eReads, string pairFileName, string distFil
 
 			if (stageId < stageSize) {														
 				Trag_reverse_eq(stageId, stageDim, stageX, stageY);		
+				
 				writeToVector(h_pairVector, h_distVector, h_out+offset, stageX, stageY, arrayDim, threshold, count);
 			}
 		}				

@@ -708,7 +708,7 @@ int main(int argc, char* argv[])
 	
 	if (outFileName.length() > 0) {		
 		string outFileName1 = outFileName;
-		outFileName1.append("_matlab");	
+		outFileName1.append("_Index1");	
 		cout << outFileName << endl;
 		cout << outFileName1 << endl;
 		outFile = fopen(outFileName.c_str(), "w");		

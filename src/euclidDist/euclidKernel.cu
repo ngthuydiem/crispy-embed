@@ -32,16 +32,20 @@ __global__ void euclidKernel(float *in, float *out, int numReads, int numSeeds, 
 		}
 		// convert from step size of 0.005 to 0.01			
 		out[index] = sqrt(sum/numSeeds); 
+		//printf("%d %d %.3f\n", row, col, out[index]);
+
 	}
-	else
+	else {
 		out[index] = 1.1f;
+		
+	}
 }
 
 void launchEuclidKernel(cudaStream_t stream, dim3 blocksPerGrid, dim3 threadsPerBlock, float * d_in, float* d_out, int numReads, int numSeeds, int stageX, int stageY, int arrayDim) 
 {	
 
 	euclidKernel<<<blocksPerGrid, threadsPerBlock, 0, stream>>>(d_in, d_out, numReads, numSeeds, stageX, stageY, arrayDim);				
-	
+
 }
 
 
